@@ -9,10 +9,10 @@ This nerdlet is designed to show the monthly NR1 Pro License costs for a master 
 ## Features
 
 * Costs are configurable (to reflect discounts) via a Json config file (see `Configuration` below)
-* Shows currrent and previous months cost usages
+* Shows current and previous months cost usages
 * Shows cost and billable usage units
 
-![Account Usage Cost](screenshots/demo.gif)
+![Account Usage Cost](screenshots/account-usage-cost.png)
 
 ## Installation
 
