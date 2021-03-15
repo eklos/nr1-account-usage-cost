@@ -26,7 +26,7 @@ This nerdlet is designed to show the monthly NR1 Pro License costs for a master 
 Currently, app-specific configuration is hardcoded into the `/src/config/srttings.json` script, and changes will need to be made in this file at the moment. The following cofiguration attributes are available:
 
 ### masterAccount
-(*mandatory*) The master account number of the customer's account must be specified here.
+(*mandatory*) The master account number of the customer's account must be specified here. If the master account is not fouund, then a critical toast message will be displayed.
 
 ### proUserUnitCost
 For Professional License accounts, this is the unit cost per FSO user per month. 
