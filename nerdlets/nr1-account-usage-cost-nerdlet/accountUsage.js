@@ -3,7 +3,7 @@ import PropTypes, { bool } from 'prop-types';
 
 import { Button, Icon, Table } from 'semantic-ui-react';
 
-import { Spinner, PlatformStateContext, NerdletStateContext, AutoSizer, nerdlet, NerdGraphQuery, Grid, GridItem, navigation, Modal } from 'nr1';
+import { Spinner, PlatformStateContext, NerdletStateContext, AutoSizer, nerdlet, NerdGraphQuery, Grid, GridItem, navigation, Modal, Toast } from 'nr1';
 
 const MONTH_NAMES_FULL = [
     "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
@@ -71,7 +71,9 @@ export default class AccountUsage extends React.Component {
             aiProactiveDetectionTotalTrans: 0,
             accountTotalCost: 0,
             sortNameDirection: 'ascending',
-            sortIdDirection: 'ascending'
+            sortIdDirection: 'ascending',
+            foundMasterAccount: false,
+            invalidMasterAccount: false
         }
 
         this.isLoaded = this.isLoaded.bind(this);
@@ -258,6 +260,7 @@ export default class AccountUsage extends React.Component {
                                                     if (detectionValues[0].id == this.props.masterAccount) {
                                                         isMasterAccount = true;
                                                         accountName = accountName + " (master)";
+                                                        this.setState({ foundMasterAccount: true });
                                                     }
                                                     var accountUsage = {
                                                         id: detectionValues[0].id,
@@ -314,7 +317,9 @@ export default class AccountUsage extends React.Component {
             parseAccounts()
             .then(() => {
                 //console.log("$$$ loadP1Processed:", this.state.loadP1Processed, " loadP1Errors", this.state.loadP1Errors, " loadP1Accounts:", this.state.loadP1Accounts);
-                
+                if (!this.state.foundMasterAccount) {
+                    this.setState({ invalidMasterAccount: true });
+                }
                 this.costUserUsage();
                 this.costBytesIngested();
                 this.costAiIncidentIntelligence();
@@ -592,13 +597,15 @@ export default class AccountUsage extends React.Component {
                     masterAccount = account;
                 }
             }
-            var transInMillions = 0;
-            transInMillions = Math.floor(masterAccount.aiProactiveDetectionTrans / 1000000) - 100;
-    
-            if (transInMillions > totalTransInMillions) {
-               masterAccount.aiProactiveDetectionBillableTrans = (transInMillions - totalTransInMillions); 
-               masterAccount.aiProactiveDetectionCost = (masterAccount.aiProactiveDetectionBillableTrans * this.props.aiProactiveDetectionUnitCost);
-               totalTransCost = totalTransCost + masterAccount.aiProactiveDetectionCost;
+            if (masterAccount != null) {
+                var transInMillions = 0;
+                transInMillions = Math.floor(masterAccount.aiProactiveDetectionTrans / 1000000) - 100;
+        
+                if (transInMillions > totalTransInMillions) {
+                masterAccount.aiProactiveDetectionBillableTrans = (transInMillions - totalTransInMillions); 
+                masterAccount.aiProactiveDetectionCost = (masterAccount.aiProactiveDetectionBillableTrans * this.props.aiProactiveDetectionUnitCost);
+                totalTransCost = totalTransCost + masterAccount.aiProactiveDetectionCost;
+                }
             }
         }
         if (masterAccount != null) {
@@ -736,7 +743,14 @@ export default class AccountUsage extends React.Component {
         {
             return <Spinner fillContainer />;
         }
-       else {
+        else if (this.state.invalidMasterAccount) {
+            Toast.showToast({
+              title: 'Master account not found',
+              description: 'Nerdpack not configured correctly - see documentation',
+              type: Toast.TYPE.CRITICAL,
+            });
+        }
+        else {
             //console.log("@@@ accountUsages:", this.state.accountsUsages);
             return (
                 <PlatformStateContext.Consumer>

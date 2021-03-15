@@ -59,7 +59,7 @@ export default class Root extends React.Component {
       loadSettingsFromJson() {
         const parseSettings = async () => {
           var loadSettings = jsonSettings;
-          var masterAccount = 1796917; //0;
+          var masterAccount = 0;
           var proUserUnitCost = 349.00;
           var bytesIngestedUnitCost = 0.25;
           var aiIncidentIntelligenceUnitCost = 0.50;
@@ -105,8 +105,8 @@ export default class Root extends React.Component {
                 aiIncidentIntelligenceUnitCost,
                 aiProactiveDetectionUnitCost } = this.state;
 
-        //console.log("masterAccount:", masterAccount);
-        //console.log("accounts", accounts);
+        console.log("masterAccount:", masterAccount);
+        console.log("accounts", accounts);
 
         return (
             <PlatformStateContext.Consumer>
